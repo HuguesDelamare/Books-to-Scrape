@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-
 def get_books_infos_from_category(url):
         response = requests.get(url)
         if response.ok:
@@ -44,13 +43,13 @@ def get_books_infos(books):
                 article_review = int(5)
             else:
                 article_review = int(0)
-            article_picture_selector = soup2.find('div', {'class': 'item active'}).find('img')
-            article_picture = article_picture_selector['src']
+            article_picture_selector = soup2.find('div', {'class': 'item active'}).select('img')[0]['src']
+            article_picture_split = article_picture_selector.split('../')[2]
+            article_picture_src_link = 'http://books.toscrape.com/' + article_picture_split
             article_title = soup2.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text
-            article_image = "image.png"
             book_datas = [article_url, article_upc, article_title, article_price_including_tax,
                           article_price_excluding_tax, article_stock, article_description, article_category,
-                          article_review, article_image]
+                          article_review, article_picture_src_link]
             all_book_datas.append(book_datas)
     check_result(all_book_datas)
 
@@ -78,8 +77,8 @@ def get_books_categories():
 
 def check_result(array):
     for result in array:
-        print(result[2])
-        print(result[8])
+        print(result)
+
 
 ### DEMARAGE DU CODE ###
 get_books_categories()
