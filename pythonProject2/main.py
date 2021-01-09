@@ -1,12 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
-all_book_datas = []
-#Utiliser librairie python recup image
-#Fonction pour faire fichier CSV
-#Changer les noms des variables ( plus lisibles)
-
+import csv
 
 ### Fonction permettant de récupèrer les urls des books d'une catégorie ###
 def get_books_from_category(url):
@@ -21,9 +16,10 @@ def get_books_from_category(url):
             href = split[3]
             url_article = 'http://books.toscrape.com/catalogue/' + str(href)
             book_data = get_book_info(url_article)
+            #print(book_data)
         try:
             next_page_selector = soup.find('section').find('li', {'class': 'next'}).select('a')
-            print("Found next page")
+            #print("Found next page")
             next_page_href = next_page_selector[0]['href']
             url_split = url.rsplit("/", 1)
             next_page_url = url_split[0] + str("/" + next_page_href)
@@ -65,31 +61,35 @@ def get_book_info(url):
             article_picture_split = article_picture_selector.split('../')[2]
             article_picture_src_link = 'http://books.toscrape.com/' + article_picture_split
             article_title = soup.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text
-            book_datas = [article_url, article_upc, article_title, article_price_including_tax,
-                          article_price_excluding_tax, article_stock, article_description, article_category,
-                          article_review, article_picture_src_link]
+            book_datas = {'product_page_url': article_url, 'upc': article_upc, 'title': article_title, 'price_including_tax': article_price_including_tax,
+                          'price_excluding_tax': article_price_excluding_tax, 'number_available': article_stock, 'product_description': article_description, 'category': article_category,
+                          'review_rating': article_review, 'image_url': article_picture_src_link}
+            create_csv_file(article_category.replace("\n",''), book_datas)
             return book_datas
-            #all_book_datas.append(book_datas)
-    #check_result(all_book_datas)
 
-#def find_next_page(soup, url):
+def create_csv_file(category, data):
+    with open('csv_files/'+ category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
+        #category = category.replace("\n", '')
+        header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available',
+                  'product_description', 'category', 'review_rating', 'image_url']
+        writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
 
+        writer.writeheader()
+        writer.writerow(data)
 
 ### Fonction pour trouver toutes les catégories présentes sur le site ###
 def get_books_categories():
     main_page_url = 'http://books.toscrape.com/index.html'
     response_main_page_url = requests.get(main_page_url)
     if response_main_page_url.ok:
-        soup1 = BeautifulSoup(response_main_page_url.text, 'html.parser')
-        #for category in soup1.find('ul', {'class': 'nav nav-list'}).find('ul').select('li'):
-            #category_link = "http://books.toscrape.com/" + category.a['href']
-        get_books_from_category('http://books.toscrape.com/catalogue/category/books/fantasy_19/index.html')
-
-def check_result(array):
-    for result in array:
-        print(result)
+        soup = BeautifulSoup(response_main_page_url.text, 'html.parser')
+        category_selector = soup.find('ul', {'class': 'nav nav-list'}).find('ul').select('li')
+        for category in category_selector:
+            #category_name = " ".join(category.a.text.split())
+            #print("New category : " + category)
+            category_link = "http://books.toscrape.com/" + category.a['href']
+            get_books_from_category(category_link)
 
 ### DEMARAGE DU CODE ###
 get_books_categories()
-
 
