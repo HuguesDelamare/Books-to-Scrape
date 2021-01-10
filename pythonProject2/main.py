@@ -34,16 +34,16 @@ def get_book_info(url):
         soup = BeautifulSoup(response.text, 'html.parser')
         if response.ok:
             soup = BeautifulSoup(response.text, 'html.parser')
-            article_url = url
+            article_url = str(url)
             article_stock_selector = str(soup.find('table', {'class': 'table table-striped'}).select('td')[5].text)
             article_stock = re.findall(r'\d+', article_stock_selector)[0]
-            article_description = soup.find('article', {'class': 'product_page'}).select('p')[3].text
-            article_upc = soup.find('table', {'class': 'table table-striped'}).select('td')[0].text
-            article_price_including_tax = soup.find('table', {'class': 'table table-striped'}).select('td')[
-                3].text
-            article_price_excluding_tax = soup.find('table', {'class': 'table table-striped'}).select('td')[
-                2].text
-            article_category = soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text
+            article_description = str(soup.find('article', {'class': 'product_page'}).select('p')[3].text)
+            article_upc = str(soup.find('table', {'class': 'table table-striped'}).select('td')[0].text)
+            article_price_including_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
+                3].text)
+            article_price_excluding_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
+                2].text)
+            article_category = str(soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text)
             article_review_selector = soup.find('div', {'class': 'col-sm-6 product_main'}).select('p')[2]['class'][1]
             if article_review_selector == "One":
                 article_review = int(1)
@@ -59,23 +59,20 @@ def get_book_info(url):
                 article_review = int(0)
             article_picture_selector = soup.find('div', {'class': 'item active'}).select('img')[0]['src']
             article_picture_split = article_picture_selector.split('../')[2]
-            article_picture_src_link = 'http://books.toscrape.com/' + article_picture_split
-            article_title = soup.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text
-            book_datas = {'product_page_url': article_url, 'upc': article_upc, 'title': article_title, 'price_including_tax': article_price_including_tax,
-                          'price_excluding_tax': article_price_excluding_tax, 'number_available': article_stock, 'product_description': article_description, 'category': article_category,
-                          'review_rating': article_review, 'image_url': article_picture_src_link}
+            article_picture_src_link = str('http://books.toscrape.com/' + article_picture_split)
+            article_title = str(soup.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text)
+            book_datas = {'product_page_url': article_url, 'upc': article_upc, 'title': article_title, 'price_including_tax': article_price_including_tax, 'price_excluding_tax': article_price_excluding_tax, 'number_available': article_stock, 'product_description': article_description, 'category': article_category, 'review_rating': article_review, 'image_url': article_picture_src_link}
             create_csv_file(article_category.replace("\n",''), book_datas)
             return book_datas
 
 def create_csv_file(category, data):
     with open('csv_files/'+ category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
-        #category = category.replace("\n", '')
         header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available',
                   'product_description', 'category', 'review_rating', 'image_url']
-        writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
-
+        writer = csv.DictWriter(csv_file, fieldnames=header)
         writer.writeheader()
         writer.writerow(data)
+
 
 ### Fonction pour trouver toutes les catégories présentes sur le site ###
 def get_books_categories():
