@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import csv
+import os
+import urllib.request
 
 ### Fonction permettant de récupèrer les urls des books d'une catégorie ###
 def get_books_from_category(url):
@@ -44,6 +46,7 @@ def get_book_info(url):
             article_price_excluding_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
                 2].text)
             article_category = str(soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text)
+            print(article_category)
             article_review_selector = soup.find('div', {'class': 'col-sm-6 product_main'}).select('p')[2]['class'][1]
             if article_review_selector == "One":
                 article_review = int(1)
@@ -61,17 +64,45 @@ def get_book_info(url):
             article_picture_split = article_picture_selector.split('../')[2]
             article_picture_src_link = str('http://books.toscrape.com/' + article_picture_split)
             article_title = str(soup.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text)
+            get_book_picture(article_url, article_title)
             book_datas = {'product_page_url': article_url, 'upc': article_upc, 'title': article_title, 'price_including_tax': article_price_including_tax, 'price_excluding_tax': article_price_excluding_tax, 'number_available': article_stock, 'product_description': article_description, 'category': article_category, 'review_rating': article_review, 'image_url': article_picture_src_link}
-            create_csv_file(article_category.replace("\n",''), book_datas)
+            create_csv_file(article_category.replace("\n", ''), book_datas)
             return book_datas
 
 def create_csv_file(category, data):
-    with open('csv_files/'+ category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
-        header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available',
-                  'product_description', 'category', 'review_rating', 'image_url']
-        writer = csv.DictWriter(csv_file, fieldnames=header)
-        writer.writeheader()
-        writer.writerow(data)
+    ### On tente de chercher le dossier ou deposer le fichier CSV ###
+    try:
+        with open('csv_files/' + category + '.csv', newline='') as csv_file:
+            reader = csv.DictReader(csv_file)
+            ### Si on trouve le dossier correspondant, on ajoute les données dans le fichier existant ###
+            if reader:
+                with open('csv_files/' + category + '.csv', 'a', encoding='UTF8', newline='') as csv_file:
+                    header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
+                    writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
+                    writer.writerow(data)
+    ### Si on ne trouve pas le dossier pour deposer le fichier CSV ####
+    except FileNotFoundError:
+        ### On créée le fichier dans le dossier ###
+        with open('csv_files/' + category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
+            header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
+            writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
+            writer.writeheader()
+            writer.writerow(data)
+    finally:
+        print("Enregistrement du fichier")
+
+def get_book_picture(file_url, file_name):
+    r = requests.get(file_url)
+    picture_name = re.sub('[^A-Za-z0-9]+', '', file_name)
+    try:
+        file_path = 'books_cover_pictures/' + picture_name + '.png'
+        with open(file_path, 'wb') as file:
+            file.write(r.content)
+    except OSError:
+        os.mkdir('books_cover_pictures/')
+        file_path = 'books_cover_pictures/' + picture_name + '.png'
+        with open(file_path, 'wb') as file:
+            file.write(r.content)
 
 
 ### Fonction pour trouver toutes les catégories présentes sur le site ###
