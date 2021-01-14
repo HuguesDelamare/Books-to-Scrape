@@ -45,7 +45,7 @@ def get_book_info(url):
                 3].text)
             article_price_excluding_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
                 2].text)
-            article_category = str(soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text)
+            article_category = str(soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text).replace("\n", '')
             print(article_category)
             article_review_selector = soup.find('div', {'class': 'col-sm-6 product_main'}).select('p')[2]['class'][1]
             if article_review_selector == "One":
@@ -64,9 +64,9 @@ def get_book_info(url):
             article_picture_split = article_picture_selector.split('../')[2]
             article_picture_src_link = str('http://books.toscrape.com/' + article_picture_split)
             article_title = str(soup.find('div', {'class': 'col-sm-6 product_main'}).select('h1')[0].text)
-            get_book_picture(article_url, article_title)
+            get_book_picture(article_picture_src_link, article_title, article_category)
             book_datas = {'product_page_url': article_url, 'upc': article_upc, 'title': article_title, 'price_including_tax': article_price_including_tax, 'price_excluding_tax': article_price_excluding_tax, 'number_available': article_stock, 'product_description': article_description, 'category': article_category, 'review_rating': article_review, 'image_url': article_picture_src_link}
-            create_csv_file(article_category.replace("\n", ''), book_datas)
+            create_csv_file(article_category, book_datas)
             return book_datas
 
 def create_csv_file(category, data):
@@ -78,35 +78,46 @@ def create_csv_file(category, data):
             if reader:
                 with open('csv_files/' + category + '.csv', 'a', encoding='UTF8', newline='') as csv_file:
                     header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
-                    writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
+                    writer = csv.DictWriter(csv_file, fieldnames=header)
                     writer.writerow(data)
     ### Si on ne trouve pas le dossier pour deposer le fichier CSV ####
     except FileNotFoundError:
         ### On créée le fichier dans le dossier ###
         with open('csv_files/' + category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
             header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
-            writer = csv.DictWriter(csv_file, fieldnames=header, dialect='excel')
+            writer = csv.DictWriter(csv_file, fieldnames=header)
             writer.writeheader()
             writer.writerow(data)
     finally:
         print("Enregistrement du fichier")
 
-def get_book_picture(file_url, file_name):
+def get_book_picture(file_url, file_name, file_category):
     r = requests.get(file_url)
     picture_name = re.sub('[^A-Za-z0-9]+', '', file_name)
     try:
-        file_path = 'books_cover_pictures/' + picture_name + '.png'
-        with open(file_path, 'wb') as file:
-            file.write(r.content)
-    except OSError:
-        os.mkdir('books_cover_pictures/')
-        file_path = 'books_cover_pictures/' + picture_name + '.png'
-        with open(file_path, 'wb') as file:
-            file.write(r.content)
+        os.mkdir('./books_cover_pictures')
+    except Exception:
+       pass
 
+    if os.path.isdir('./books_cover_pictures/' + file_category):
+        print("EXISTE")
+        file_path = 'books_cover_pictures/'+ file_category + '/' + picture_name + '.' + file_url.split('.')[-1]
+        with open(file_path, 'wb') as file:
+            file.write(r.content)
+    else:
+        print("EXISTE PAS")
+        os.makedirs('./books_cover_pictures/' + file_category)
+        file_path = 'books_cover_pictures/' + file_category + '/' + picture_name + '.' + file_url.split('.')[-1]
+        with open(file_path, 'wb') as file:
+            file.write(r.content)
 
 ### Fonction pour trouver toutes les catégories présentes sur le site ###
 def get_books_categories():
+    #Create directory where we will save all the files
+    try:
+        os.mkdir('./csv_files')
+    except Exception as e:
+        pass
     main_page_url = 'http://books.toscrape.com/index.html'
     response_main_page_url = requests.get(main_page_url)
     if response_main_page_url.ok:
@@ -115,7 +126,7 @@ def get_books_categories():
         for category in category_selector:
             #category_name = " ".join(category.a.text.split())
             #print("New category : " + category)
-            category_link = "http://books.toscrape.com/" + category.a['href']
+            category_link = 'http://books.toscrape.com/' + category.a['href']
             get_books_from_category(category_link)
 
 ### DEMARAGE DU CODE ###
