@@ -4,7 +4,6 @@ import re
 import csv
 import os
 
-
 ### Fonction permettant de récupèrer les urls des books d'une catégorie ###
 def get_books_from_category(url):
     response = requests.get(url)
@@ -18,19 +17,17 @@ def get_books_from_category(url):
             href = split[3]
             url_article = 'http://books.toscrape.com/catalogue/' + str(href)
             book_data = get_book_info(url_article)
-            #print(book_data)
         try:
             next_page_selector = soup.find('section').find('li', {'class': 'next'}).select('a')
-            #print("Found next page")
             next_page_href = next_page_selector[0]['href']
             url_split = url.rsplit("/", 1)
             next_page_url = url_split[0] + str("/" + next_page_href)
-            print(" Next page : " + next_page_url)
+            print(" Page suivante : " + next_page_url)
             get_books_from_category(next_page_url)
         except:
             pass
 
-###  Fonction permettant de récupérer les infos d'un article(book) ###
+###  Fonction permettant de récupérer les infos d'un article(book) via le HTML & CSS ###
 def get_book_info(url):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -69,6 +66,7 @@ def get_book_info(url):
             create_csv_file(article_category, book_datas)
             return book_datas
 
+###  Fonction pour créer le fichier csv contenant les données des différents livres ###
 def create_csv_file(category, data):
     ### On tente de chercher le dossier ou deposer le fichier CSV ###
     try:
@@ -89,8 +87,9 @@ def create_csv_file(category, data):
             writer.writeheader()
             writer.writerow(data)
     finally:
-        print("Enregistrement du fichier")
+        print("Enregistrement des données dans fichier csv " + category)
 
+###  Fonction pour stocker les images des différents livres dans un dossier ###
 def get_book_picture(file_url, file_name, file_category):
     r = requests.get(file_url)
     picture_name = re.sub('[^A-Za-z0-9]+', '', file_name)
@@ -110,7 +109,6 @@ def get_book_picture(file_url, file_name, file_category):
 
 ### Fonction pour trouver toutes les catégories présentes sur le site ###
 def get_books_categories():
-    #Create directory where we will save all the files
     try:
         os.mkdir('./csv_files')
     except Exception as e:
@@ -121,8 +119,7 @@ def get_books_categories():
         soup = BeautifulSoup(response_main_page_url.text, 'html.parser')
         category_selector = soup.find('ul', {'class': 'nav nav-list'}).find('ul').select('li')
         for category in category_selector:
-            #category_name = " ".join(category.a.text.split())
-            #print("New category : " + category)
+            print("Catégorie suivante")
             category_link = 'http://books.toscrape.com/' + category.a['href']
             get_books_from_category(category_link)
 
