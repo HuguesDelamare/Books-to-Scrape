@@ -1,4 +1,6 @@
 
+***INSTALLATION ENVIRONEMENT***
+
 -Ouvrez votre CMD windows (Invite de commande en FR).
 
 -Choisissez le lieu ou créer votre dossier qui contiendra le projet en utilisant la commande ci-dessous :
