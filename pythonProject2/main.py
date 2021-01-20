@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import csv
 import os
-import urllib.request
+
 
 ### Fonction permettant de récupèrer les urls des books d'une catégorie ###
 def get_books_from_category(url):
@@ -98,14 +98,11 @@ def get_book_picture(file_url, file_name, file_category):
         os.mkdir('./books_cover_pictures')
     except Exception:
        pass
-
     if os.path.isdir('./books_cover_pictures/' + file_category):
-        print("EXISTE")
         file_path = 'books_cover_pictures/'+ file_category + '/' + picture_name + '.' + file_url.split('.')[-1]
         with open(file_path, 'wb') as file:
             file.write(r.content)
     else:
-        print("EXISTE PAS")
         os.makedirs('./books_cover_pictures/' + file_category)
         file_path = 'books_cover_pictures/' + file_category + '/' + picture_name + '.' + file_url.split('.')[-1]
         with open(file_path, 'wb') as file:
