@@ -1,26 +1,46 @@
+## Table of contents
+* [General info](#general-info)
+* [Technologies](#technologies)
+* [Setup](#setup)
 
-***INSTALLATION ENVIRONEMENT***
+## General info
+<p>This project was made to learn how to scrap datas from a website using HTML & CSS tags.<br>
+I've been asked to get datas from all the books from all categories (title,price,description,etc...) and insert/save them in a CSV file.</p>
+	
+## Technologies
+Project is created with:
+* Python version: 3.9
+* Beautifulsoup library version: 4.9.3
+* Requests library: 2.25.1
 
--Ouvrez votre CMD windows (Invite de commande en FR).
+## Setup
+Open your terminal (CMD).
 
--Choisissez le lieu ou créer votre dossier qui contiendra le projet en utilisant la commande ci-dessous :
-	Ex: C:\Users\NomUtilisateur>mkdir NomDossier
+Choose the destination where you want to put folder that will contain the project:
 
--Installez l'environement dans ce dossier avec la commande :
-	Ex: C:\Users\NomUtilisateur>python -m venv NomDeMonDossier\venv *cela peut prendre quelques secondes à installer
+	$ cd YourFolderPath
 
--Une fois cela fait, nous allons rentrer dans notre environement avec la commande :
-	Ex: C:\Users\NomUtilisateur>NomDeMonDossier\venv\Scripts\activate.bat
+Once you've picked a path for your folder we can create that folder:
 
--Installons maintenant les packages, pour cela on place le fichier "requirements.txt" et "main.py" à l'intérieur de notre dossier.
+	$ mkdir FolderName
 
--On rentre la commande suivante afin d'installer le tout :
-	Ex: C:\Users\NomUtilisateur>pip install -r requirements.txt
+Installing the python environement in this folder:
 
--On rentre dans le dossier pour lancer le projet via la console:
-	Ex: (venv) C:\Users\NomUtilisateur>cd NomDossier
+  	$ python -m venv FolderNamevenv
 
--L'environement étant créée nous pouvons maintenant lancer le projet :
-	Ex: (venv) C:\Users\NomUtilisateur\NomDossier>python main.py
+After installing the environement:
 
--Le projet se lancera et le déroulement sera visible dans la console CMD
+	$ FolderName\venv\Scripts\activate.bat
+
+You need now to drag and drop the `requirements.txt` & `main.py` inside your project folder.After doing this we need to go to our directory: 
+  
+  	$ cd YourFolderName
+
+We can now install all the libraries necessary for the project:
+	$ pip install -r requirements.txt
+The environement is functional we can now start the project:
+
+	$ python main.py
+	
+
+The project should start and you'll see infos of the script progression in your terminal.	

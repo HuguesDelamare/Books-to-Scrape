@@ -4,7 +4,7 @@ import re
 import csv
 import os
 
-### Fonction permettant de récupèrer les urls des books d'une catégorie ###
+### Function to get book url from category ###
 def get_books_from_category(url):
     response = requests.get(url)
     if response.ok:
@@ -27,7 +27,7 @@ def get_books_from_category(url):
         except:
             pass
 
-###  Fonction permettant de récupérer les infos d'un article(book) via le HTML & CSS ###
+### Function to get infos from book by scrapping his HTML & CSS page ###
 def get_book_info(url):
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -66,21 +66,21 @@ def get_book_info(url):
             create_csv_file(article_category, book_datas)
             return book_datas
 
-###  Fonction pour créer le fichier csv contenant les données des différents livres ###
+### Function to create a CSV file containing the differents infos from books by category ###
 def create_csv_file(category, data):
-    ### On tente de chercher le dossier ou deposer le fichier CSV ###
+    ### We try to find the folder to depot our file ###
     try:
         with open('csv_files/' + category + '.csv', newline='') as csv_file:
             reader = csv.DictReader(csv_file)
-            ### Si on trouve le dossier correspondant, on ajoute les données dans le fichier existant ###
+            ### If we find the corresponding folder, we append the datas in the existing file ###
             if reader:
                 with open('csv_files/' + category + '.csv', 'a', encoding='UTF8', newline='') as csv_file:
                     header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
                     writer = csv.DictWriter(csv_file, fieldnames=header)
                     writer.writerow(data)
-    ### Si on ne trouve pas le dossier pour deposer le fichier CSV ####
+    ### If we can't find the folder to depot the CSV file ###
     except FileNotFoundError:
-        ### On créée le fichier dans le dossier ###
+        ### We create  the file in the folder ###
         with open('csv_files/' + category + '.csv', 'w', encoding='UTF8', newline='') as csv_file:
             header = ['product_page_url', 'upc', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
             writer = csv.DictWriter(csv_file, fieldnames=header)
@@ -89,7 +89,7 @@ def create_csv_file(category, data):
     finally:
         print("Enregistrement des données dans fichier csv " + category)
 
-###  Fonction pour stocker les images des différents livres dans un dossier ###
+### Function to stock images from the differents books by categories ###
 def get_book_picture(file_url, file_name, file_category):
     r = requests.get(file_url)
     picture_name = re.sub('[^A-Za-z0-9]+', '', file_name)
@@ -107,7 +107,7 @@ def get_book_picture(file_url, file_name, file_category):
         with open(file_path, 'wb') as file:
             file.write(r.content)
 
-### Fonction pour trouver toutes les catégories présentes sur le site ###
+### Function to find all the existing categories of the website ###
 def get_books_categories():
     try:
         os.mkdir('./csv_files')
@@ -123,6 +123,6 @@ def get_books_categories():
             category_link = 'http://books.toscrape.com/' + category.a['href']
             get_books_from_category(category_link)
 
-### DEMARAGE DU CODE ###
+### STARTING THE CODE ###
 get_books_categories()
 
