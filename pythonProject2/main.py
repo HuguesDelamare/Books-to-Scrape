@@ -22,7 +22,7 @@ def get_books_from_category(url):
             next_page_href = next_page_selector[0]['href']
             url_split = url.rsplit("/", 1)
             next_page_url = url_split[0] + str("/" + next_page_href)
-            print(" Page suivante : " + next_page_url)
+            print("Next page : " + next_page_url)
             get_books_from_category(next_page_url)
         except:
             pass
@@ -38,10 +38,12 @@ def get_book_info(url):
             article_stock = re.findall(r'\d+', article_stock_selector)[0]
             article_description = str(soup.find('article', {'class': 'product_page'}).select('p')[3].text)
             article_upc = str(soup.find('table', {'class': 'table table-striped'}).select('td')[0].text)
-            article_price_including_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
+            article_price_including_tax_selector = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
                 3].text)
-            article_price_excluding_tax = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
+            article_price_including_tax= float(article_price_including_tax_selector[2 : :])
+            article_price_excluding_tax_selector = str(soup.find('table', {'class': 'table table-striped'}).select('td')[
                 2].text)
+            article_price_excluding_tax = float(article_price_excluding_tax_selector[2 : :])
             article_category = str(soup.find('ul', {'class': 'breadcrumb'}).select('li')[2].text).replace("\n", '')
             print(article_category)
             article_review_selector = soup.find('div', {'class': 'col-sm-6 product_main'}).select('p')[2]['class'][1]
@@ -87,7 +89,7 @@ def create_csv_file(category, data):
             writer.writeheader()
             writer.writerow(data)
     finally:
-        print("Enregistrement des données dans fichier csv " + category)
+        print("Datas recording to CSV file " + category)
 
 ### Function to stock images from the differents books by categories ###
 def get_book_picture(file_url, file_name, file_category):
@@ -119,7 +121,7 @@ def get_books_categories():
         soup = BeautifulSoup(response_main_page_url.text, 'html.parser')
         category_selector = soup.find('ul', {'class': 'nav nav-list'}).find('ul').select('li')
         for category in category_selector:
-            print("Catégorie suivante")
+            print("Next category")
             category_link = 'http://books.toscrape.com/' + category.a['href']
             get_books_from_category(category_link)
 
