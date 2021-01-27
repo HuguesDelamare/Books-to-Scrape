@@ -24,20 +24,23 @@ Once you've picked a path for your folder we can create that folder:
 
 	$ mkdir FolderName
 
+Now, we can clone the project in our folder by using the github https method (don't forget to be in the folder you just created):
+
+	$ git clone https://github.com/HuguesDelamare/Books-to-Scrape.git
+
+
 Installing the python environement in this folder:
 
-  	$ python -m venv FolderNamevenv
+  	$ python -m venv EnvironementName
 
 After installing the environement:
 
-	$ FolderName\venv\Scripts\activate.bat
-
-You need now to drag and drop the `requirements.txt` & `main.py` inside your project folder.After doing this we need to go to our directory: 
-  
-  	$ cd YourFolderName
+	$ YourEnvName\Scripts\activate
 
 We can now install all the libraries necessary for the project:
+
 	$ pip install -r requirements.txt
+
 The environement is functional we can now start the project:
 
 	$ python main.py
