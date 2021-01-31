@@ -11,7 +11,7 @@
 
 ## Technologies
 
----
+
 
 Project is created with:
 * Python version: 3.9
@@ -20,7 +20,7 @@ Project is created with:
 
 ## Installation
 
----
+
 
 * Make sure you have Python 3.7+ installed. (I developed it with Python 3.9).
 * Installing pip will be needed to install packages. (pip is already installed if you are using Python 2 >=2.7.9 or Python 3 >=3.4 downloaded from python.org)
