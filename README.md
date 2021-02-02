@@ -56,7 +56,7 @@ on Linux (Advanced Package Tool (Python 3.x)) :
     sudo apt-get install python3-pip
 
 <h4>Installing Git</h4>
-You can go the official [website] of Git(https://git-scm.com/downloads) to intall it.
+You can go the official [Website  of Git](https://git-scm.com/downloads) to intall it.
     
 
 <h3>Installing the project</h3>
